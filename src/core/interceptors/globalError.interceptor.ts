@@ -1,12 +1,18 @@
-import { CallHandler, Catch, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import {
+  CallHandler,
+  Catch,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 interface IError {
-    statusCode?: number;
-    message: string | object;
-    success: boolean;
+  statusCode?: number;
+  message: string | object;
+  success: boolean;
 }
 
 @Injectable()
@@ -16,10 +22,17 @@ export class GlobalErrorInterceptor implements NestInterceptor {
     return next.handle().pipe(
       catchError((error) => {
         const response = context.switchToHttp().getResponse();
-        let errorResponse: IError = { success: false,message: 'Internal Server Error'};
+        let errorResponse: IError = {
+          success: false,
+          message: 'Internal Server Error',
+        };
 
         if (error instanceof HttpException) {
-          errorResponse = { success: false, message: error.getResponse(), statusCode: error.getStatus()}; // Extract details from HttpException
+          errorResponse = {
+            success: false,
+            message: error.getResponse(),
+            statusCode: error.getStatus(),
+          }; // Extract details from HttpException
         } else {
           // Handle non-HttpException errors (optional)
           errorResponse.success = false;
@@ -27,7 +40,9 @@ export class GlobalErrorInterceptor implements NestInterceptor {
           errorResponse.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
         }
 
-        response.status(errorResponse.statusCode || HttpStatus.INTERNAL_SERVER_ERROR).json(errorResponse);
+        response
+          .status(errorResponse.statusCode || HttpStatus.INTERNAL_SERVER_ERROR)
+          .json(errorResponse);
         return throwError(() => error); // Throw the original error to stop further processing
       }),
     );

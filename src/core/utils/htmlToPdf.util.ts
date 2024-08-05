@@ -4,7 +4,6 @@ import * as path from 'path';
 import * as fs from 'fs'; // Ensure correct import of fs module
 import { Workbook } from 'exceljs';
 
-
 // generate pdf from html
 export const generatePdfFromHtml = async () => {
   try {
@@ -112,7 +111,10 @@ export const generatePdfFromHtml = async () => {
     const page = await browser.newPage();
 
     // Set content with a higher timeout
-    await page.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
+    await page.setContent(html, {
+      waitUntil: 'networkidle0',
+      timeout: 60000,
+    });
 
     // Generate PDF with a higher timeout
     await page.pdf({ path: filePath, format: 'A4', margin: margins });
@@ -125,45 +127,37 @@ export const generatePdfFromHtml = async () => {
   }
 };
 
-
-
-
-
 // generate csv from html
 
 // Sample data - replace this with data from your database
 const databaseColumns = [
-    { id: 1, name: 'John', age: 30, country: 'USA' },
-    { id: 2, name: 'Jane', age: 25, country: 'Canada' },
-    { id: 3, name: 'Mike', age: 35, country: 'UK' },
-    { id: 4, name: 'Emily', age: 28, country: 'Australia' },
-    { id: 5, name: 'David', age: 40, country: 'Germany' }
+  { id: 1, name: 'John', age: 30, country: 'USA' },
+  { id: 2, name: 'Jane', age: 25, country: 'Canada' },
+  { id: 3, name: 'Mike', age: 35, country: 'UK' },
+  { id: 4, name: 'Emily', age: 28, country: 'Australia' },
+  { id: 5, name: 'David', age: 40, country: 'Germany' },
+];
+
+// Function to generate Excel file
+export const generateExcelFile = async (data?: []) => {
+  const workbook = new Workbook();
+  const worksheet = workbook.addWorksheet('Database Columns');
+
+  // Define columns
+  worksheet.columns = [
+    { header: 'ID', key: 'id', width: 10 },
+    { header: 'Name', key: 'name', width: 20 },
+    { header: 'Age', key: 'age', width: 10 },
+    { header: 'Country', key: 'country', width: 20 },
   ];
 
+  // Add rows from database columns
+  databaseColumns.forEach((row) => {
+    worksheet.addRow(row);
+  });
 
-  // Function to generate Excel file
-export const generateExcelFile = async (data?:[]) => {
-    const workbook = new Workbook();
-    const worksheet = workbook.addWorksheet('Database Columns');
-  
-    // Define columns
-    worksheet.columns = [
-      { header: 'ID', key: 'id', width: 10 },
-      { header: 'Name', key: 'name', width: 20 },
-      { header: 'Age', key: 'age', width: 10 },
-      { header: 'Country', key: 'country', width: 20 }
-    ];
-  
-    // Add rows from database columns
-    databaseColumns.forEach((row) => {
-      worksheet.addRow(row);
-    });
-  
-    // Generate Excel file
-    const filePath = 'database_columns.xlsx';
-    await workbook.xlsx.writeFile(filePath);
-    console.log(`Excel file generated: ${filePath}`);
-  };
-  
-
-
+  // Generate Excel file
+  const filePath = 'database_columns.xlsx';
+  await workbook.xlsx.writeFile(filePath);
+  console.log(`Excel file generated: ${filePath}`);
+};

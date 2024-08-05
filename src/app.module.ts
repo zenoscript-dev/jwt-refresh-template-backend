@@ -5,31 +5,31 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as redisStore from 'cache-manager-redis-store';
-import ormConfig, { getDatabaseNamespaceIds } from './config/orm.config';
-import type { RedisClientOptions } from 'redis';
 import { UserModule } from './user/user.module';
-
-
-// database connections for each tenant
-
-console.log(getDatabaseNamespaceIds(), "asdasddas")
-const databasesConfig = getDatabaseNamespaceIds().map((tenantId) => {
-  return TypeOrmModule.forRootAsync({
-    name: `database-${tenantId}`,
-    imports: [ConfigModule.forFeature(ormConfig)],
-    useFactory: (config: ConfigService) => config.get(`orm.${tenantId}`),
-    inject: [ConfigService],
-  });
-});
+import * as redisStore from 'cache-manager-ioredis';
 
 @Module({
-  imports: [ConfigModule.forRoot({isGlobal: true}),...databasesConfig, CacheModule.register({
-    isGlobal: true,
-    store: redisStore,
-    host: process.env.REDIS_HOST,
-    port: parseInt(process.env.REDIS_PORT) || 6379,
-  }),AuthModule, UserModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: process.env.DB_HOST,
+      port: 3306,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      entities: [process.env.DB_ENTITIES],
+      synchronize: true,
+    }),
+    CacheModule.register({
+      isGlobal: true,
+      store: redisStore,
+      host: process.env.REDIS_HOST,
+      port: parseInt(process.env.REDIS_PORT) || 6379,
+    }),
+    AuthModule,
+    UserModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -6,9 +6,9 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-} from "typeorm";
+} from 'typeorm';
 
-@Entity("blacklistedtokens")
+@Entity('blacklistedtokens')
 export class BlackListedTokens {
   @PrimaryGeneratedColumn()
   id: number;
@@ -30,7 +30,10 @@ export class BlackListedTokens {
   async setExpiration() {
     if (!this.expiresAt) {
       const currentDate = new Date();
-      this.expiresAt = new Date(currentDate.getTime() + Number(process.env.REFRESH_EXPIRY) * 60 * 60 * 1000); // Adjust as needed
+      this.expiresAt = new Date(
+        currentDate.getTime() +
+          Number(process.env.REFRESH_EXPIRY) * 60 * 60 * 1000,
+      ); // Adjust as needed
     }
   }
 }

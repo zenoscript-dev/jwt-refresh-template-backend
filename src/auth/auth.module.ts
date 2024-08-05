@@ -8,19 +8,29 @@ import jwtConfig from './config/jwt.config';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { CachingUtil } from 'src/core/utils/caching.util';
 import { BlackListTokenService } from './services/blackListToken.service';
-import { DBClient } from 'src/core/db/dbclient.service';
+import { BlackListedTokens } from './models/blackListTokens.model';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 const passportModule = PassportModule.register({
-  defaultStrategy: ''
-})
+  defaultStrategy: '',
+});
 
 @Module({
-  imports: [PassportModule,
-  ConfigModule.forFeature(jwtConfig),
-  JwtModule.registerAsync(jwtConfig.asProvider())
+  imports: [
+    TypeOrmModule.forFeature([BlackListedTokens]),
+    PassportModule,
+    ConfigModule.forFeature(jwtConfig),
+    JwtModule.registerAsync(jwtConfig.asProvider()),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy,CachingUtil,Logger, BlackListTokenService, DBClient],
-  exports: [passportModule]
+  providers: [
+    AuthService,
+    JwtStrategy,
+    CachingUtil,
+    Logger,
+    BlackListTokenService,
+    BlackListedTokens,
+  ],
+  exports: [passportModule],
 })
 export class AuthModule {}

@@ -1,5 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { JwtService } from "@nestjs/jwt";
+import { JwtService } from '@nestjs/jwt';
 import { CachingUtil } from 'src/core/utils/caching.util';
 import { UserTokenPayload } from './types/userToken.payload';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
@@ -42,6 +42,7 @@ export class AuthService {
       // await this.cachingUtil.setCache(userTokenPayload.id, signedJwt, Number(process.env.JWT_EXPIRES_IN));
       return { accessToken: accessToken, refreshToken: refreshToken };
     } catch (error) {
+      console.log(error);
       throw new Error('unable to generate jwt token');
     }
   }
@@ -83,7 +84,6 @@ export class AuthService {
         const userTokenPayload = new UserTokenPayload();
         userTokenPayload.id = userDetails.id;
         userTokenPayload.roles = userDetails.roles;
-        userTokenPayload.namespace = userDetails.namespace;
 
         // generate accessToken and refresh token pair
         const { accessToken, refreshToken } =
@@ -114,7 +114,7 @@ export class AuthService {
       }
 
       const userDetails = userDetailsFromToken as any; // Cast to any or a specific type if you have one
-      console.log(userDetails)
+      console.log(userDetails);
 
       // Check if the token is blacklisted
       const isTokenBlacklisted = await this.blackListService.isTokenBlacklisted(
@@ -122,7 +122,7 @@ export class AuthService {
         userDetails.namespace,
       );
 
-      console.log(isTokenBlacklisted)
+      console.log(isTokenBlacklisted);
 
       if (isTokenBlacklisted) {
         throw new HttpException(
@@ -141,7 +141,6 @@ export class AuthService {
         const userTokenPayload = new UserTokenPayload();
         userTokenPayload.id = userDetails.id;
         userTokenPayload.roles = userDetails.roles;
-        userTokenPayload.namespace = userDetails.namespace;
 
         // Generate new access and refresh tokens
         const { accessToken, refreshToken } =

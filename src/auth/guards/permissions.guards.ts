@@ -38,7 +38,6 @@
 //       return hasPermission;
 //     }
 
-
 //     let userPermissionsSet = new Set();
 //     if (user.permissions) {
 //        for (let index = 0; index < user.permissions.length; index++) {
@@ -60,7 +59,7 @@
 //         const permissionExluded = routePermissions.some(element => {
 //           return excludedPermissionIds.includes(element);
 //         });
-        
+
 //         return !permissionExluded;
 //       }
 
@@ -82,7 +81,6 @@
 //         }
 //       }
 //     }
-
 
 //     const userPermissions = Array.from(userPermissionsSet);
 //     this.logger.log(' #### userPermissions : ' + userPermissions + " ###### Required Permission : " + routePermissions, PermissionsGuard.name);

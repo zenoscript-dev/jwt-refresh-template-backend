@@ -1,7 +1,7 @@
 export class UserContext {
-    userId: string;
-    employeeId: string;
-    namespace: string;
-    roles: string[];
-    roleIds: Number[]
+  userId: string;
+  employeeId: string;
+  namespace: string;
+  roles: string[];
+  roleIds: Number[];
 }
