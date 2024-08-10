@@ -13,7 +13,7 @@ export class BlackListTokenService {
     private logger: Logger,
   ) {}
 
-  async blacklistToken(token: string, expiresIn: number, namespace: string) {
+  async blacklistToken(token: string, expiresIn: number) {
     this.logger.log('calling token blacklisting method ---------------->');
 
     try {

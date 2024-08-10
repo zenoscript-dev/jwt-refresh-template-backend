@@ -44,20 +44,20 @@ export class UserController {
   ): Promise<LoginResponse> {
     try {
       const response: LoginResponse = await this.userService.login(userDetails);
-      const { accessToken, refreshToken } = response;
+      const { accessToken, refreshToken, userId } = response;
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
       });
 
-      res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-      });
+      // res.cookie('accessToken', accessToken, {
+      //   httpOnly: true,
+      //   secure: process.env.NODE_ENV === 'production',
+      //   sameSite: 'strict',
+      // });
 
-      return res.json({ success: true });
+      return res.json({ success: true, statusCode: 200, accessToken, userId });
     } catch (error) {
       throw new HttpException(error.message, error.status);
     }

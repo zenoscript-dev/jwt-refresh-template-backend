@@ -111,16 +111,16 @@ export class UserService {
       // generate jwt token
       const newUserToken = new UserTokenPayload();
       newUserToken.id = userDetails.id;
-      newUserToken.roles = [];
       const token =
         await this.authService.generateJWTTokenWithRefresh(newUserToken);
 
       return {
-        employeeId: userDetails.employeeId,
+        userId: userDetails.id,
         accessToken: token['accessToken'],
         refreshToken: token['refreshToken'],
       };
     } catch (error) {
+      console.log(error);
       throw new HttpException(error.message, error.status);
     }
   }

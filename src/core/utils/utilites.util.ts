@@ -68,7 +68,7 @@ export const checkPasswordValidation = (value: string) => {
     return 'Password must contain at least one Special Character.';
   }
 
-  const isValidLength = /^.{10,16}$/;
+  const isValidLength = /^.{8,16}$/;
   if (!isValidLength.test(value)) {
     return 'Password must be 10-16 Characters Long.';
   }

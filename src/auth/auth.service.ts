@@ -83,7 +83,6 @@ export class AuthService {
       if (istokenValid) {
         const userTokenPayload = new UserTokenPayload();
         userTokenPayload.id = userDetails.id;
-        userTokenPayload.roles = userDetails.roles;
 
         // generate accessToken and refresh token pair
         const { accessToken, refreshToken } =
@@ -93,7 +92,6 @@ export class AuthService {
         const tokenToBlackList = await this.blackListService.blacklistToken(
           refreshTokenFromClient.refreshToken,
           Number(process.env.REFRESH_EXPIRY),
-          userDetails.namespace,
         );
         return { accessToken: accessToken, refreshToken: refreshToken };
       }
@@ -140,7 +138,6 @@ export class AuthService {
       if (isTokenValid) {
         const userTokenPayload = new UserTokenPayload();
         userTokenPayload.id = userDetails.id;
-        userTokenPayload.roles = userDetails.roles;
 
         // Generate new access and refresh tokens
         const { accessToken, refreshToken } =
@@ -150,9 +147,8 @@ export class AuthService {
         const tokenToBlackList = await this.blackListService.blacklistToken(
           refreshTokenFromClient.refreshToken,
           Number(process.env.REFRESH_EXPIRY),
-          userDetails.namespace,
         );
-        return { accessToken, refreshToken };
+        return { accessToken, refreshToken, userId: userDetails.id };
       }
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
