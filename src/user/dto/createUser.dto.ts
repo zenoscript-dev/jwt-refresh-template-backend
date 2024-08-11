@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsOptional, IsString, IsStrongPassword } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsStrongPassword,
+  IsObject,
+  ValidateIf,
+} from 'class-validator';
+import { fileType } from '../types/file.type';
 
 export class CreateUserDto {
   @IsString()
@@ -14,9 +22,8 @@ export class CreateUserDto {
   @IsStrongPassword()
   password: string;
 
+  @ValidateIf((o) => o.profilePic !== undefined)
+  @IsObject()
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  profilePic?: string;
-
+  profilePic?: fileType;
 }

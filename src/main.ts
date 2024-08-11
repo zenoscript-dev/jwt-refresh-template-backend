@@ -20,6 +20,7 @@ import { AllExceptionsFilter } from './core/filters/allExceptions.filter';
 import { ResponseTransformInterceptor } from './core/interceptors/response.transform.interceptor';
 import { GlobalErrorInterceptor } from './core/interceptors/globalError.interceptor';
 import * as cookieParser from 'cookie-parser';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -69,6 +70,13 @@ async function bootstrap() {
     }),
   });
 
+  const microservice = app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.TCP,
+    options: {
+      port: 5500,
+    },
+  });
+
   // API Document generation
   const document = new DocumentBuilder()
     .setTitle('ats')
@@ -116,6 +124,7 @@ async function bootstrap() {
   // app.useGlobalFilters(new HttpExceptionFilter(), new AllExceptionsFilter(httpAdapterHost));
   app.use(json({ limit: '30mb' }));
   app.use(urlencoded({ extended: true, limit: '30mb' }));
+  await app.startAllMicroservices();
   await app.listen(process.env.APP_PORT || 8080);
 }
 bootstrap();

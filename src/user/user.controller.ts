@@ -4,38 +4,57 @@ import {
   HttpException,
   Post,
   Req,
-  UseGuards,
   Res,
-  Get,
+  UploadedFile,
+  UseInterceptors,
   HttpCode,
+  Get,
 } from '@nestjs/common';
 import { UserService } from './service/user.service';
 import { CreateUserDto } from './dto/createUser.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
 import { UserLoginDto } from './dto/userLogin.dto';
 import { LoginResponse } from 'src/user/types/loginResponse.type';
-import {
-  generatePdfFromHtml,
-  generateExcelFile,
-} from 'src/core/utils/htmlToPdf.util';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { User } from './models/user.model';
+import { EventPattern, Payload } from '@nestjs/microservices';
 
-// @UseGuards(JwtAuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // create a new user ----only admin-----
   @Post('create')
-  // @UseGuards(JwtAuthGuard)
-  async createUser(@Body() userDetails: CreateUserDto, @Req() req: any) {
+  @UseInterceptors(FileInterceptor('profilePic')) // Handle file upload
+  async createUser(
+    @Body() createUserDto: CreateUserDto,
+    @UploadedFile() profilePic: any,
+    @Req() req: any
+  ) {
+
+
     try {
-      return await this.userService.createUser(userDetails);
+      if (profilePic) {
+        if(profilePic){
+          return await this.userService.createUser(createUserDto, profilePic);
+        }else{
+          return await this.userService.createUser(createUserDto);
+        }
+      //   createUserDto.profilePic = {
+      //     buffer: profilePic.buffer,
+      //     mimetype: profilePic.mimetype,
+      //     filename: profilePic.originalname,
+      //   };
+      // }
+      // console.log(createUserDto);
+
+      // return await this.userService.createUser(createUserDto);
+      }
     } catch (error) {
       throw new HttpException(error.message, error.status);
     }
   }
+
+  
   @Post('login')
-  // @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   async userLogin(
     @Body() userDetails: UserLoginDto,
@@ -51,24 +70,15 @@ export class UserController {
         sameSite: 'strict',
       });
 
-      // res.cookie('accessToken', accessToken, {
-      //   httpOnly: true,
-      //   secure: process.env.NODE_ENV === 'production',
-      //   sameSite: 'strict',
-      // });
-
       return res.json({ success: true, statusCode: 200, accessToken, userId });
     } catch (error) {
       throw new HttpException(error.message, error.status);
     }
   }
-  @Get('report')
-  // @UseGuards(JwtAuthGuard)
-  async genertereport(): Promise<any> {
-    try {
-      return await generateExcelFile();
-    } catch (error) {
-      throw new HttpException(error.message, error.status);
-    }
+
+  @EventPattern("user-details")
+  async getUserDetails(@Payload() userId: string[]):Promise<User[]>{
+    return await this.userService.getUserDetails(userId);
   }
+
 }

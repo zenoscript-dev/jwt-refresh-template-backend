@@ -9,9 +9,17 @@ import { BlackListTokenService } from 'src/auth/services/blackListToken.service'
 import { BlackListedTokens } from 'src/auth/models/blackListTokens.model';
 import { User } from './models/user.model';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppModule } from 'src/app.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, BlackListedTokens])],
+  imports: [TypeOrmModule.forFeature([User, BlackListedTokens]), ClientsModule.register([
+    { 
+      name: 'MINIO_SERVICE', 
+      transport: Transport.TCP, 
+      options: { host: "localhost", port: 5000 }, // Add the correct host and port here
+    },
+  ]),],
   providers: [
     UserService,
     Logger,
